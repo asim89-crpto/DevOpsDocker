@@ -1,0 +1,63 @@
+﻿@page "/student"
+@rendermode InteractiveServer
+
+@using StudentApp.Models
+@using StudentApp.Data
+
+@inject AppDbContext Db
+
+<h3>Student Registration</h3>
+
+<EditForm Model="@student"
+          OnValidSubmit="SaveStudent"
+          FormName="StudentForm">
+
+    <div class="mb-3">
+        <label>Name</label>
+        <InputText class="form-control"
+                   @bind-Value="student.Name" />
+    </div>
+
+    <div class="mb-3">
+        <label>Email</label>
+        <InputText class="form-control"
+                   @bind-Value="student.Email" />
+    </div>
+
+    <div class="mb-3">
+        <label>Course</label>
+        <InputText class="form-control"
+                   @bind-Value="student.Course" />
+    </div>
+
+    <button type="submit"
+            class="btn btn-primary">
+        Save
+    </button>
+
+</EditForm>
+
+@if (!string.IsNullOrEmpty(message))
+{
+    <div class="alert alert-success mt-3">
+        @message
+    </div>
+}
+
+@code
+{
+    private Student student = new();
+
+    private string message = "";
+
+    private async Task SaveStudent()
+    {
+        message = $"{student.Name} | {student.Email} | {student.Course}";
+
+        Db.Students.Add(student);
+
+        await Db.SaveChangesAsync();
+
+        student = new();
+    }
+}

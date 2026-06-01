@@ -1,0 +1,82 @@
+﻿@page "/students"
+@rendermode InteractiveServer
+
+@using StudentApp.Data
+@using StudentApp.Models
+@using Microsoft.EntityFrameworkCore
+
+@inject AppDbContext Db
+
+<h3>Students</h3>
+
+@if (students == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Course</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var s in students)
+            {
+                <tr>
+                    <td>@s.Id</td>
+                    <td>@s.Name</td>
+                    <td>@s.Email</td>
+                    <td>@s.Course</td>
+
+                    <td>
+                        <a href="/student/edit/@s.Id"
+                           class="btn btn-warning">
+                            Edit
+                        </a>
+
+                        <button class="btn btn-danger"
+                                @onclick="() => DeleteStudent(s.Id)">
+                            Delete
+                        </button>
+                    </td>
+                    <td>
+                        <button class="btn btn-danger"
+                                @onclick="() => DeleteStudent(s.Id)">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code
+{
+    private List<Student> students = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        students = await Db.Students.ToListAsync();
+    }
+
+    private async Task DeleteStudent(int id)
+    {
+        var student = await Db.Students.FindAsync(id);
+
+        if (student != null)
+        {
+            Db.Students.Remove(student);
+
+            await Db.SaveChangesAsync();
+
+            students = await Db.Students.ToListAsync();
+        }
+    }
+}
