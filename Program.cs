@@ -16,6 +16,26 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 var app = builder.Build();
 
+for (int i = 1; i <= 12; i++)
+{
+    try
+    {
+        using var scope = app.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+        db.Database.Migrate();
+
+        Console.WriteLine("Database migration successful.");
+        break;
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Database connection attempt {i} failed.");
+        Console.WriteLine(ex.Message);
+
+        Thread.Sleep(10000);
+    }
+}
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
